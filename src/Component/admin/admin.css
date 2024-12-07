@@ -1,11 +1,10 @@
-/* admin.css */
 
 .admin-panel {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  /* background-color: #78030F; */
+ 
 }
 
 .admin-box {

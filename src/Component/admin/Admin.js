@@ -2,23 +2,21 @@ import React, { useState } from "react";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./admin.css"; // Import the custom CSS for additional styling
-import { v4 as uuidv4 } from "uuid"; // Import uuid for generating unique ids
+import "./admin.css";
+import { v4 as uuidv4 } from "uuid";
 
 const Admin = () => {
-  const navigate = useNavigate(); // Initialize navigate hook
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     siteName: "",
     device_id: "",
     deviceName: "",
     module_id: "",
-    dynamicFields: [], // Add dynamic fields to form data
+    dynamicFields: [],
   });
 
-  const [allModules, setAllModules] = useState([]); // Store all modules for a device
-  // data mudule will extract and will send with api
-  // 
+  const [allModules, setAllModules] = useState([]);
 
   const predefinedDropdownOptions = [
     "Voltage L1N",
@@ -93,7 +91,7 @@ const Admin = () => {
       const { dynamicFieldsKeys } = response.data;
 
       const dynamicFieldsArray = dynamicFieldsKeys.map((key) => ({
-        unique_id: uuidv4(), // Assign unique id
+        unique_id: uuidv4(),
         key,
         value: "",
         dropdownValue: "",
@@ -113,38 +111,30 @@ const Admin = () => {
       return;
     }
 
-    // Structure module data with module_id and device_id
     const newModuleData = {
       module_id: formData.module_id,
-      device_id: formData.device_id, // Include device_id for each module
+      device_id: formData.device_id,
       dynamicFields: formData.dynamicFields.map((field) => ({
         key: field.key,
         value: field.selectedKeyValue?.value || field.value,
-        actual_value: field.value || "", // Set actual_value appropriately
+        actual_value: field.value || "",
       })),
     };
 
     try {
-      // Get existing modules from localStorage
       const existingModules = JSON.parse(localStorage.getItem("allModules")) || [];
-
-      // Check if the module_id already exists in the modules array
       const moduleIndex = existingModules.findIndex(
         (module) => module.module_id === newModuleData.module_id
       );
 
       if (moduleIndex >= 0) {
-        // If the module_id exists, update the module data
         existingModules[moduleIndex] = newModuleData;
       } else {
-        // If the module_id doesn't exist, add a new entry
         existingModules.push(newModuleData);
       }
 
-      // Save updated modules to localStorage
       localStorage.setItem("allModules", JSON.stringify(existingModules));
 
-      // Reset module-specific fields for the next input
       setFormData({
         ...formData,
         module_id: "",
@@ -158,71 +148,16 @@ const Admin = () => {
     }
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //   try {
-  //     const allModulesFromStorage = JSON.parse(localStorage.getItem("allModules")) || [];
-
-  //     // Create the payload with unique device_id for each module
-  //     const finalPayload = {
-  //       siteName: formData.siteName,
-  //       Devices: allModulesFromStorage.map((module) => ({
-  //         device_id: module.device_id, // Use unique device_id for each module
-  //         module_id: module.module_id, // Module ID should remain different for each module
-  //         dynamic_fields: module.dynamicFields.map((field) => ({
-  //           key: field.key,
-  //           value: field.value,
-  //           activeValue: field.selectedKeyValue?.value || field.value,
-  //         })),
-  //       })),
-  //     };
-
-  //     console.log("Payload being sent to backend:", JSON.stringify(finalPayload, null, 2));
-
-  //     // Send the payload to the backend
-  //     const response = await axios.post("http://localhost:3000/device_motherson", finalPayload);
-
-  //     alert("Data saved successfully!");
-
-  //     // Clear localStorage and form data
-  //     localStorage.removeItem("allModules");
-  //     setFormData({
-  //       siteName: "",
-  //       device_id: "",
-  //       deviceName: "",
-  //       module_id: "",
-  //       dynamicFields: [],
-  //     });
-
-  //     // Navigate to the counter page with deviceId and moduleId in the state
-  //     navigate("/counterr", {
-  //       state: {
-  //         deviceId: allModulesFromStorage[0]?.device_id,
-  //         moduleId: allModulesFromStorage[0]?.module_id,
-  //       },
-  //     });
-  //   } catch (error) {
-  //     console.error("Error details:", error.response ? error.response.data : error.message);
-  //     alert("An error occurred while saving data.");
-  //   }
-  // };
-
-  // Latest 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
-      // Fetch all modules from localStorage
       const allModulesFromStorage = JSON.parse(localStorage.getItem("allModules")) || [];
-      console.log("Modules from localStorage:", allModulesFromStorage);
-  
-      // Create the payload with dynamic fields for each module
       const finalPayload = {
         siteName: formData.siteName,
         Devices: allModulesFromStorage.map((module) => ({
-          device_id: module.device_id, // Unique device_id for each module
-          module_id: module.module_id, // Unique module_id for each module
+          device_id: module.device_id,
+          module_id: module.module_id,
           dynamic_fields: module.dynamicFields.map((field) => ({
             key: field.key,
             value: field.value,
@@ -230,15 +165,11 @@ const Admin = () => {
           })),
         })),
       };
-  
-      console.log("Payload being sent to backend:", JSON.stringify(finalPayload, null, 2));
-  
-      // Send the payload to the backend
+
       await axios.post("http://localhost:3000/device_motherson", finalPayload);
-  
+
       alert("Data saved successfully!");
-  
-      // Clear localStorage and form data
+
       localStorage.removeItem("allModules");
       setFormData({
         siteName: "",
@@ -247,19 +178,17 @@ const Admin = () => {
         module_id: "",
         dynamicFields: [],
       });
-  
-      // Collect deviceIds and moduleIds
+
       const deviceIds = allModulesFromStorage.map((module) => module.device_id);
       const moduleIds = allModulesFromStorage.map((module) => module.module_id);
-  
-      // Navigate to the `/counterr` route and pass data as state
+
       navigate("/counterr", { state: { deviceIds, moduleIds } });
     } catch (error) {
       console.error("Error details:", error.response ? error.response.data : error.message);
       alert("An error occurred while saving data.");
     }
   };
-  
+
   return (
     <Container fluid className="admin-panel">
       <Row className="justify-content-center">

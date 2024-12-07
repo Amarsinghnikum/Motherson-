@@ -1,4 +1,4 @@
-/* Global Styles */
+
 body {
   margin: 0;
   font-family: 'Roboto', sans-serif;
@@ -192,7 +192,7 @@ label {
   .btn {
     padding: 8px 12px;
     margin: 5px 0;
-    width: calc(100% - 30px); /* Adjusting width to fit container */
+    width: calc(100% - 30px);
   }
 
   .custom-file-upload {
@@ -203,9 +203,9 @@ label {
     padding: 10px;
   }
 
-  /* Center export buttons and adjust padding */
+
   .form-group .btn {
-    padding: 6px 10px; /* Adjusted padding */
+    padding: 6px 10px;
     margin: 5px 0;
     width: 100%;
   }
